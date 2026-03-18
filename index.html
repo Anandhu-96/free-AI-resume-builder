@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResumeAI Builder | Create Your Resume Fast</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #111b33;
+      --text: #eaf0ff;
+      --muted: #aeb7cf;
+      --accent: #6f9bff;
+      --accent2: #8dffcb;
+      --border: rgba(255,255,255,0.08);
+      --radius: 16px;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; color: var(--text); background: radial-gradient(circle at 0 0, #121f3f 0%, #0b1220 40%, #070b18 100%); }
+    .page { width: min(1100px, 92%); margin: 0 auto; padding: 1.4rem 0 2.5rem; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; gap: 1rem; }
+    .logo { display: inline-flex; align-items: center; gap: 0.45rem; font-weight: 800; letter-spacing: -0.02em; }
+    .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, #8b9dff, #60e9e4); }
+    .badge { display: inline-flex; background: #1b2b5f; border: 1px solid rgba(255,255,255,0.09); border-radius: 999px; padding: 0.2rem 0.6rem; color: #d4ddff; font-size: 0.75rem; gap: 0.25rem; align-items: center; }
+    .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: center; margin-top: 0.65rem; }
+    .hero h1 { margin: 0; font-size: clamp(2rem, 6vw, 3.25rem); line-height: 1.1; letter-spacing: -0.03em; }
+    .hero p { color: var(--muted); font-size: 1rem; line-height: 1.6; margin: 0.9rem 0 1.3rem; max-width: 52ch; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-bottom: 1.2rem; }
+    .btn { border: 0; border-radius: 10px; font-weight: 600; padding: 0.7rem 1rem; cursor: pointer; transition: transform .12s ease, box-shadow .15s ease; }
+    .btn-primary { background: linear-gradient(120deg, #6f9bff, #5bc6ff); color: #06143d; box-shadow: 0 10px 28px rgba(29, 77, 178, 0.35); }
+    .btn-secondary { background: #19294f; color: #cbd7ff; border: 1px solid rgba(255,255,255,0.1); }
+    .btn:hover { transform: translateY(-1px); }
+    .hero-grid { display: grid; gap: 0.8rem; grid-template-columns: repeat(2, minmax(0,1fr)); margin-top: 0.4rem; }
+    .pill { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.05); border-radius: 999px; padding: 0.35rem 0.7rem; font-size: 0.75rem; color: #dce5ff; }
+    .card { background: linear-gradient(180deg, #131f43, #10172f 80%, #0c1427); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; }
+    .card h3 { margin-top: 0; font-size: 1rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .feature-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+    .feature-list li { font-size: 0.9rem; color:#d7def4; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 0.45rem 0.55rem; display: flex; align-items: center; gap: 0.45rem; }
+    .feature-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: #5de2c8; }
+    .section { margin-top: 1.1rem; }
+    .label { display: block; margin: 0.45rem 0 0.28rem; font-size: 0.78rem; color: #b7c2e3; letter-spacing: 0.01em; }
+    input, textarea, select { width: 100%; background: #111b34; color: #f6f8ff; border: 1px solid #2b3c74; border-radius: 10px; padding: 0.55rem 0.65rem; font: inherit; }
+    textarea { min-height: 84px; resize: vertical; }
+    .form-grid { display: grid; gap: 0.8rem; grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .resume-preview { margin-top: 1rem; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); background: linear-gradient(180deg, #1d274f 0%, #111b34 80%); padding: 0.9rem; }
+    .resume-title { margin: 0 0 0.45rem; color:#ffffff; font-size: 1rem; }
+    .subtitle { font-size: 0.85rem; color: #b4c1ea; margin: 0; }
+    .bullet { margin-top: 0.5rem; color:#dbe2ff; font-size: 0.85rem; }
+    .preview-meta { margin: 0.3rem 0 0; font-size: 0.78rem; color:#9fabd5; }
+    .hero-art { border-radius: 18px; background: linear-gradient(140deg, rgba(93,140,255,0.25), rgba(20,42,105,0.95)); border: 1px solid rgba(255,255,255,0.08); padding: 1rem; }
+    .hero-art h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+    .hero-art p { margin: 0 0 0.8rem; color: #cad4ff; }
+    .chips { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+    .chip { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; padding: 0.35rem 0.65rem; font-size: 0.75rem; color: #e8f0ff; }
+    .testimonial { margin-top: 0.8rem; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.12); border-radius: 12px; padding: 0.7rem; color: #d8e1ff; }
+    .testimonial p { margin: 0; font-size: 0.9rem; }
+    .testimonial small { display: block; margin-top: 0.4rem; color:#9eb0dc; }
+    .footer { margin-top: 2rem; text-align: center; color: #9daed6; font-size: 0.82rem; }
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .hero-art { margin-top: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="logo"><span class="logo-dot"></span>ResumeAI</div>
+      <div class="badge">🚀 Smart Resume AI</div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="badge" style="margin-bottom: 0.6rem;">NEW • AI-Powered Resume Builder</div>
+        <h1>Build a standout resume in minutes with AI that writes, designs, and optimizes for jobs.</h1>
+        <p>Turn your experience into an interview-winning resume with guided prompts, ATS-ready formatting, and instant preview—no designer needed.</p>
+        <div class="actions">
+          <button class="btn btn-primary">Start Free</button>
+          <button class="btn btn-secondary">See Live Demo</button>
+        </div>
+        <div class="hero-grid">
+          <span class="pill">AI Rewrites in 1s</span>
+          <span class="pill">One-click PDF Export</span>
+          <span class="pill">Job-Specific Tailoring</span>
+          <span class="pill">ATS Compliant</span>
+        </div>
+      </div>
+
+      <div class="hero-art card">
+        <h3>Live Resume Output</h3>
+        <p>As you type your role and experience, the AI instantly upgrades your text into clear impact statements and strong keywords.</p>
+        <div class="chips">
+          <span class="chip">Product Manager</span>
+          <span class="chip">Salesforce</span>
+          <span class="chip">Data-driven</span>
+          <span class="chip">Encryption</span>
+        </div>
+        <div class="testimonial">
+          <p>“I went from basic bullet points to a polished resume with metrics and ATS keywords in under 90 seconds.”</p>
+          <small>— Riya, Software Engineer</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="section grid-2">
+      <div class="card">
+        <h3>How it works</h3>
+        <ul class="feature-list">
+          <li><span class="feature-dot"></span>Paste your job description for tailored keywords.</li>
+          <li><span class="feature-dot"></span>Write role responsibilities; get optimized phrasing.</li>
+          <li><span class="feature-dot"></span>Choose a style and export to PDF with one click.</li>
+          <li><span class="feature-dot"></span>Get instant score for readability and ATS match.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Instant preview</h3>
+        <div class="resume-preview">
+          <div class="resume-title">Ava Thompson</div>
+          <p class="subtitle">Product Designer • case: 124% Adoption • 5+ years</p>
+          <p class="preview-meta">New York, NY • ava@domain.com • linkedin.com/in/ava</p>
+          <p class="bullet">• Designed growth experiments that improved onboarding conversion by 27%.</p>
+          <p class="bullet">• Led cross-functional launch with PM/engineer team and reduced support tickets by 30%.</p>
+          <p class="bullet">• Built a design system used by 120+ developers and designers globally.</p>
+        </div>
+      </div>
+    </section>
+
+    <!--<section class="section card">
+      <h3>Quick AI resume builder</h3>
+      <p style="margin-top:0.2rem; color:#c4d0eb; font-size:.9rem;">Fill these details, then click Generate to create an optimized resume draft.</p>
+      <div class="form-grid">
+        <div>
+          <label class="label" for="name">Full Name</label>
+          <input id="name" placeholder="Ava Thompson" />
+        </div>
+        <div>
+          <label class="label" for="title">Current Title</label>
+          <input id="title" placeholder="Senior Product Designer" />
+        </div>
+        <div>
+          <label class="label" for="email">Email</label>
+          <input id="email" type="email" placeholder="ava@workmail.com" />
+        </div>
+        <div>
+          <label class="label" for="phone">Phone</label>
+          <input id="phone" placeholder="(555) 123-4567" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div>
+          <label class="label" for="location">Location</label>
+          <input id="location" placeholder="New York, NY" />
+        </div>
+        <div>
+          <label class="label" for="linkedIn">LinkedIn</label>
+          <input id="linkedIn" placeholder="linkedin.com/in/ava" />
+        </div>
+        <div>
+          <label class="label" for="target">Target Role</label>
+          <select id="target">
+            <option>Product Designer</option>
+            <option>Software Engineer</option>
+            <option>Data Analyst</option>
+            <option>Marketing Manager</option>
+          </select>
+        </div>
+        <div>
+          <label class="label" for="company">Industry / Company</label>
+          <input id="company" placeholder="SaaS • Fintech" />
+        </div>
+      </div>
+      <div class="section">
+        <label class="label" for="summary">Professional Summary</label>
+        <textarea id="summary" placeholder="Experienced product designer with 6+ years delivering consumer-focused SaaS features..." ></textarea>
+      </div>
+      <div class="section">
+        <label class="label" for="experience">Key experience bullet (one role)</label>
+        <textarea id="experience" placeholder="Led end-to-end redesign of onboarding funnel, increasing activation by 35%..." ></textarea>
+      </div>
+      <div class="form-grid">
+        <div>
+          <label class="label" for="education">Highest Education</label>
+          <input id="education" placeholder="B.Sc. Computer Science, UCF" />
+        </div>
+        <div>
+          <label class="label" for="skills">Top Skills (comma separated)</label>
+          <input id="skills" placeholder="Figma, SQL, Agile, UX Research" />
+        </div>
+      </div>-->
+      <div class="section" style="padding-top:0.5rem;">
+        <h2 style="margin:0 0 0.5rem; font-size:1rem; letter-spacing:.02em; color:#e6ecff;">CREATE A RESUME</h2>
+        <div style="margin:0.25rem 0 0.35rem; color:#b7c2e3; font-size:0.84rem;">👉 Start Streamlit first from terminal: <code>streamlit run page.py</code></div>
+        <div class="actions" style="margin:0; align-items:center;">
+          <button id="generateBtn" class="btn btn-primary">Generate Resume</button>
+          <button id="downloadBtn" class="btn btn-secondary">Download PDF</button>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      function getResumeText() {
+        const fields = [
+          ['Full Name', document.getElementById('name').value],
+          ['Current Title', document.getElementById('title').value],
+          ['Email', document.getElementById('email').value],
+          ['Phone', document.getElementById('phone').value],
+          ['Location', document.getElementById('location').value],
+          ['LinkedIn', document.getElementById('linkedIn').value],
+          ['Target Role', document.getElementById('target').value],
+          ['Industry / Company', document.getElementById('company').value],
+          ['Professional Summary', document.getElementById('summary').value],
+          ['Key Experience', document.getElementById('experience').value],
+          ['Education', document.getElementById('education').value],
+          ['Skills', document.getElementById('skills').value]
+        ];
+        const lines = ['Resume', '------'];
+        for (const [label, value] of fields) {
+          if (value && value.trim()) {
+            lines.push(`${label}: ${value.trim()}`);
+          }
+        }
+        return lines.join('\n');
+      }
+
+      document.getElementById('generateBtn').addEventListener('click', function() {
+        window.open('http://localhost:8501', '_blank');
+      });
+
+      document.getElementById('downloadBtn').addEventListener('click', function() {
+        const text = getResumeText();
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Resume.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    </script>
+
+    <footer class="footer">Built for modern professionals — AI resume writing experience designed for real hiring outcomes.</footer>
+  </div>
+</body>
+</html>
