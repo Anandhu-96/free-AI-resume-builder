@@ -192,7 +192,6 @@
       </div>-->
       <div class="section" style="padding-top:0.5rem;">
         <h2 style="margin:0 0 0.5rem; font-size:1rem; letter-spacing:.02em; color:#e6ecff;">CREATE A RESUME</h2>
-        <div style="margin:0.25rem 0 0.35rem; color:#b7c2e3; font-size:0.84rem;">👉 Start Streamlit first from terminal: <code>streamlit run page.py</code></div>
         <div class="actions" style="margin:0; align-items:center;">
           <button id="generateBtn" class="btn btn-primary">Generate Resume</button>
           <button id="downloadBtn" class="btn btn-secondary">Download PDF</button>
@@ -201,28 +200,76 @@
     </section>
 
     <script>
+      function getValue(id) {
+        const el = document.getElementById(id);
+        return el ? el.value.trim() : "";
+      }
+
       function getResumeText() {
         const fields = [
-          ['Full Name', document.getElementById('name').value],
-          ['Current Title', document.getElementById('title').value],
-          ['Email', document.getElementById('email').value],
-          ['Phone', document.getElementById('phone').value],
-          ['Location', document.getElementById('location').value],
-          ['LinkedIn', document.getElementById('linkedIn').value],
-          ['Target Role', document.getElementById('target').value],
-          ['Industry / Company', document.getElementById('company').value],
-          ['Professional Summary', document.getElementById('summary').value],
-          ['Key Experience', document.getElementById('experience').value],
-          ['Education', document.getElementById('education').value],
-          ['Skills', document.getElementById('skills').value]
+          ['Full Name', getValue('name')],
+          ['Current Title', getValue('title')],
+          ['Email', getValue('email')],
+          ['Phone', getValue('phone')],
+          ['Location', getValue('location')],
+          ['LinkedIn', getValue('linkedIn')],
+          ['Target Role', getValue('target')],
+          ['Industry / Company', getValue('company')],
+          ['Professional Summary', getValue('summary')],
+          ['Key Experience', getValue('experience')],
+          ['Education', getValue('education')],
+          ['Skills', getValue('skills')]
         ];
-        const lines = ['Resume', '------'];
+
+        const lines = [
+          'Resume',
+          '------',
+          '',
+          'Full Name: __________________________',
+          'Title: ______________________________',
+          'Email: ______________________________',
+          'Phone: ______________________________',
+          'Location: ___________________________',
+          'LinkedIn: ___________________________',
+          '',
+          'Professional Summary:',
+          '•',
+          '',
+          'Experience:',
+          '•',
+          '',
+          'Education:',
+          '•',
+          '',
+          'Skills:',
+          '•'
+        ];
+
+        let hasInput = false;
+        const output = ['Resume', '------'];
+
         for (const [label, value] of fields) {
-          if (value && value.trim()) {
-            lines.push(`${label}: ${value.trim()}`);
+          if (value) {
+            output.push(`${label}: ${value}`);
+            hasInput = true;
           }
         }
-        return lines.join('\n');
+
+        if (!hasInput) {
+          return lines.join('\n');
+        }
+
+        // Add section headers for typed fields
+        output.push('\nProfessional Summary:');
+        if (getValue('summary')) output.push(getValue('summary'));
+        output.push('\nExperience:');
+        if (getValue('experience')) output.push(getValue('experience'));
+        output.push('\nEducation:');
+        if (getValue('education')) output.push(getValue('education'));
+        output.push('\nSkills:');
+        if (getValue('skills')) output.push(getValue('skills'));
+
+        return output.join('\n');
       }
 
       document.getElementById('generateBtn').addEventListener('click', function() {
