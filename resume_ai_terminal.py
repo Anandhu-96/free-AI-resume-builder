@@ -1,18 +1,15 @@
+import streamlit as st
 import json
 import os
 
-FILE = "resume_data.json"
+# ---------- CONFIG ----------
+st.set_page_config(page_title="Resume AI", layout="wide")
 
-# ---------- LOAD / SAVE ----------
-def load_resume():
-    if os.path.exists(FILE):
-        try:
-            with open(FILE, "r") as f:
-                return json.load(f)
-        except:
-            pass
+# ---------- FILE STORAGE ----------
+FILE = "resume_ai_data.json"
 
-    return {
+def load_data():
+    default = {
         "name": "",
         "contact": "",
         "objective": "",
@@ -22,93 +19,45 @@ def load_resume():
         "experience": []
     }
 
+    if os.path.exists(FILE):
+        try:
+            with open(FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                default.update(data)
+        except:
+            pass
 
-def save_resume(resume):
-    with open(FILE, "w") as f:
-        json.dump(resume, f, indent=4)
-
-
-# ---------- DISPLAY ----------
-def show_resume(resume):
-    print("\n" + "="*50)
-    print("📄 LIVE RESUME")
-    print("="*50)
-
-    print("\nName:", resume["name"])
-    print("Contact:", resume["contact"])
-
-    print("\nCareer Objective:")
-    print(resume["objective"])
-
-    print("\nEducation:")
-    for e in resume["education"]:
-        print(" -", e)
-
-    print("\nSkills:")
-    for s in resume["skills"]:
-        print(" -", s)
-
-    print("\nProjects:")
-    for p in resume["projects"]:
-        print(" -", p)
-
-    print("\nExperience:")
-    for ex in resume["experience"]:
-        print(" -", ex)
+    return default
 
 
-# ---------- FINAL GENERATE ----------
-def generate_resume(resume):
-    print("\n" + "="*60)
-    print("🚀 FINAL GENERATED RESUME")
-    print("="*60)
-
-    print(f"\n{resume['name']}")
-    print(resume["contact"])
-    print("-"*50)
-
-    if resume["objective"]:
-        print("\nCAREER OBJECTIVE")
-        print(resume["objective"])
-
-    if resume["education"]:
-        print("\nEDUCATION")
-        for e in resume["education"]:
-            print("•", e)
-
-    if resume["skills"]:
-        print("\nSKILLS")
-        print(", ".join(resume["skills"]))
-
-    if resume["projects"]:
-        print("\nPROJECTS")
-        for p in resume["projects"]:
-            print("•", p)
-
-    if resume["experience"]:
-        print("\nEXPERIENCE")
-        for ex in resume["experience"]:
-            print("•", ex)
+def save_data(data):
+    with open(FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
 
 
-# ---------- AI UNDERSTAND ----------
-def ai_update(prompt, resume):
+resume = load_data()
+
+# ---------- SESSION STATE FIX ----------
+if "generated" not in st.session_state:
+    st.session_state.generated = False
+
+# ---------- UI ----------
+st.title("🤖 Personal AI Resume Builder")
+
+# ---------- SIDEBAR AI ----------
+st.sidebar.header("AI Assistant")
+
+prompt = st.sidebar.text_input("Tell AI what to add")
+
+if st.sidebar.button("Add via AI"):
     text = prompt.lower()
 
-    if "name" in text:
-        resume["name"] = prompt.replace("name", "").strip()
-
-    elif "contact" in text or "email" in text:
-        resume["contact"] = prompt
-
-    elif "objective" in text:
-        resume["objective"] = prompt
+    if "skill" in text:
+        resume["skills"].append(prompt)
 
     elif "education" in text or "college" in text:
         resume["education"].append(prompt)
-
-    elif "skill" in text:
-        resume["skills"].append(prompt)
 
     elif "project" in text:
         resume["projects"].append(prompt)
@@ -116,66 +65,185 @@ def ai_update(prompt, resume):
     elif "experience" in text or "intern" in text:
         resume["experience"].append(prompt)
 
-    else:
-        print("⚠️ AI couldn't understand. Try keywords like skill, project, education.")
+    elif "objective" in text:
+        resume["objective"] = prompt
 
+    elif "contact" in text:
+        resume["contact"] = prompt
 
-# ---------- MAIN PROGRAM ----------
-resume = load_resume()
-
-print("🤖 PERSONAL AI RESUME BUILDER (TERMINAL)")
-print("Type 'help' for options")
-
-while True:
-
-    print("\nOptions:")
-    print("1. Add via AI prompt")
-    print("2. Manual entry")
-    print("3. Show resume")
-    print("4. Generate final resume")
-    print("5. Exit")
-
-    choice = input("\nEnter choice: ")
-
-    if choice == "1":
-        prompt = input("👉 Enter prompt: ")
-        ai_update(prompt, resume)
-        save_resume(resume)
-
-    elif choice == "2":
-        print("\nManual Entry")
-
-        resume["name"] = input("Name: ") or resume["name"]
-        resume["contact"] = input("Contact: ") or resume["contact"]
-        resume["objective"] = input("Objective: ") or resume["objective"]
-
-        edu = input("Add Education: ")
-        if edu:
-            resume["education"].append(edu)
-
-        skill = input("Add Skill: ")
-        if skill:
-            resume["skills"].append(skill)
-
-        proj = input("Add Project: ")
-        if proj:
-            resume["projects"].append(proj)
-
-        exp = input("Add Experience: ")
-        if exp:
-            resume["experience"].append(exp)
-
-        save_resume(resume)
-
-    elif choice == "3":
-        show_resume(resume)
-
-    elif choice == "4":
-        generate_resume(resume)
-
-    elif choice == "5":
-        print("Exiting...")
-        break
+    elif "name" in text:
+        resume["name"] = prompt
 
     else:
-        print("Invalid choice, try again.")
+        st.sidebar.warning("AI couldn't understand")
+
+    save_data(resume)
+
+resume_model = st.sidebar.selectbox(
+    "Choose Resume Style",
+    ["Professional", "Modern", "Executive"]
+)
+
+show_preview = st.sidebar.checkbox("Show Live Preview", True)
+
+# ---------- INPUT ----------
+st.header("Enter Details")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    resume["name"] = st.text_input("Full Name", resume["name"])
+    resume["contact"] = st.text_input("Contact / Email", resume["contact"])
+
+with col2:
+    resume["objective"] = st.text_area("Career Objective", resume["objective"])
+
+# ---------- ADD ITEMS ----------
+st.subheader("Add Details")
+
+edu = st.text_input("Education", key="edu")
+if st.button("Add Education"):
+    if edu:
+        resume["education"].append(edu)
+
+skill = st.text_input("Skill", key="skill")
+if st.button("Add Skill"):
+    if skill:
+        resume["skills"].append(skill)
+
+proj = st.text_input("Project", key="proj")
+if st.button("Add Project"):
+    if proj:
+        resume["projects"].append(proj)
+
+exp = st.text_input("Experience", key="exp")
+if st.button("Add Experience"):
+    if exp:
+        resume["experience"].append(exp)
+
+save_data(resume)
+
+# ---------- LIVE PREVIEW ----------
+st.header("📄 Live Resume Preview")
+
+if show_preview:
+
+    col1, col2 = st.columns([1, 2])
+
+    with col1:
+        st.markdown("### Basic Info")
+        st.write("**Name:**", resume["name"] or "-")
+        st.write("**Contact:**", resume["contact"] or "-")
+        st.write("**Objective:**", resume["objective"] or "-")
+
+    with col2:
+        if resume_model == "Professional":
+            st.markdown("## " + (resume["name"] or "Your Name"))
+            st.write("_" + (resume["contact"] or "Contact details") + "_")
+            st.write("---")
+        else:
+            st.subheader(resume["name"] or "Your Name")
+            st.write(resume["contact"] or "Contact details")
+
+        if resume["objective"]:
+            st.markdown("### Career Objective")
+            st.write(resume["objective"])
+
+        if resume["education"]:
+            st.markdown("### Education")
+            for e in resume["education"]:
+                st.write("•", e)
+
+        if resume["skills"]:
+            st.markdown("### Skills")
+            st.write(", ".join(resume["skills"]))
+
+        if resume["projects"]:
+            st.markdown("### Projects")
+            for p in resume["projects"]:
+                st.write("•", p)
+
+        if resume["experience"]:
+            st.markdown("### Experience")
+            for ex in resume["experience"]:
+                st.write("•", ex)
+
+else:
+    st.info("Enable preview from sidebar")
+
+# ---------- GENERATE FINAL RESUME (FIXED) ----------
+st.header("🚀 Generate Final Resume")
+
+if st.button("Generate Resume"):
+    st.session_state.generated = True
+
+if st.session_state.generated:
+
+    st.success("✅ Resume Generated Successfully!")
+
+    st.markdown("## 📄 Final Resume")
+
+    st.markdown(f"# {resume['name']}")
+    st.write(resume["contact"])
+
+    st.write("---")
+
+    if resume["objective"]:
+        st.markdown("### Career Objective")
+        st.write(resume["objective"])
+
+    if resume["education"]:
+        st.markdown("### Education")
+        for e in resume["education"]:
+            st.write("•", e)
+
+    if resume["skills"]:
+        st.markdown("### Skills")
+        st.write(", ".join(resume["skills"]))
+
+    if resume["projects"]:
+        st.markdown("### Projects")
+        for p in resume["projects"]:
+            st.write("•", p)
+
+    if resume["experience"]:
+        st.markdown("### Experience")
+        for ex in resume["experience"]:
+            st.write("•", ex)
+
+# ---------- DOWNLOAD ----------
+def generate_text_resume(resume):
+    text = f"{resume['name']}\n{resume['contact']}\n\n"
+
+    text += "Career Objective\n" + resume["objective"] + "\n\n"
+
+    text += "Education\n"
+    for e in resume["education"]:
+        text += f"- {e}\n"
+
+    text += "\nSkills\n" + ", ".join(resume["skills"]) + "\n\n"
+
+    text += "Projects\n"
+    for p in resume["projects"]:
+        text += f"- {p}\n"
+
+    text += "\nExperience\n"
+    for ex in resume["experience"]:
+        text += f"- {ex}\n"
+
+    return text
+
+
+st.header("📥 Download Resume")
+
+resume_text = generate_text_resume(resume)
+
+st.download_button(
+    label="Download as TXT",
+    data=resume_text,
+    file_name="resume.txt",
+    mime="text/plain"
+)
+
+# ---------- AUTO SAVE ----------
+save_data(resume)
