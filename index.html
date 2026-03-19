@@ -272,28 +272,16 @@
         return output.join('\n');
       }
 
-      function ensureStreamlitAndOpen() {
+      document.getElementById('generateBtn').addEventListener('click', function() {
         const streamlitUrl = 'http://localhost:8501';
-        if (window.location.protocol === 'file:') {
-          alert('Please open this app through http://localhost:8000 (run "python server.py").');
-          return;
-        }
-
-        fetch('http://localhost:8000/start-streamlit', { method: 'POST' })
-          .then((res) => res.json())
-          .then((data) => {
-            const url = data.url || streamlitUrl;
-            window.open(url, '_blank');
+        fetch(streamlitUrl, { method: 'HEAD' })
+          .then(() => {
+            window.open(streamlitUrl, '_blank');
           })
           .catch(() => {
-            window.open(streamlitUrl, '_blank');
-            setTimeout(() => {
-              alert('Could not talk to local server at http://localhost:8000. Run "python server.py" and reload this page.');
-            }, 200);
+            alert('Streamlit is not running. Run "streamlit run page.py" in your project folder, then click Generate again.');
           });
-      }
-
-      document.getElementById('generateBtn').addEventListener('click', ensureStreamlitAndOpen);
+      });
 
       document.getElementById('downloadBtn').addEventListener('click', function() {
         const text = getResumeText();
