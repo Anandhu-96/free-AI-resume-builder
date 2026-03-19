@@ -273,14 +273,7 @@
       }
 
       document.getElementById('generateBtn').addEventListener('click', function() {
-        const streamlitUrl = 'http://localhost:8501';
-        fetch(streamlitUrl, { method: 'HEAD' })
-          .then(() => {
-            window.open(streamlitUrl, '_blank');
-          })
-          .catch(() => {
-            alert('Streamlit is not running. Run "streamlit run page.py" in your project folder, then click Generate again.');
-          });
+        window.open('http://localhost:8501', '_blank');
       });
 
       document.getElementById('downloadBtn').addEventListener('click', function() {
