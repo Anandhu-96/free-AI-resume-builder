@@ -279,11 +279,15 @@
             if (data.url) {
               window.open(data.url, '_blank');
             } else {
-              alert('Unable to start Streamlit. Please run "python server.py" and retry.');
+              window.open('http://localhost:8501', '_blank');
             }
           })
           .catch(() => {
-            alert('Cannot contact local server. Run "python server.py" first, then reload this page.');
+            // Fallback: if start-server fails, still try Streamlit directly.
+            window.open('http://localhost:8501', '_blank');
+            setTimeout(() => {
+              alert('Could not talk to local server at http://localhost:8000. Make sure you run "python server.py".');
+            }, 200);
           });
       });
 
