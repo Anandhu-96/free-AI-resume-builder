@@ -273,7 +273,18 @@
       }
 
       document.getElementById('generateBtn').addEventListener('click', function() {
-        window.open('http://localhost:8501', '_blank');
+        fetch('http://localhost:8000/start-streamlit', { method: 'POST' })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.url) {
+              window.open(data.url, '_blank');
+            } else {
+              alert('Unable to start Streamlit. Please run "python server.py" and retry.');
+            }
+          })
+          .catch(() => {
+            alert('Cannot contact local server. Run "python server.py" first, then reload this page.');
+          });
       });
 
       document.getElementById('downloadBtn').addEventListener('click', function() {
