@@ -273,7 +273,9 @@
       }
 
       document.getElementById('generateBtn').addEventListener('click', function() {
-        window.open('http://localhost:8501', '_blank');
+        const host = window.location.hostname || 'localhost';
+        const url = `http://${host}:8501`;
+        window.open(url, '_blank');
       });
 
       document.getElementById('downloadBtn').addEventListener('click', function() {

@@ -17,7 +17,7 @@ def start_streamlit():
     global streamlit_process
     if streamlit_process and streamlit_process.poll() is None:
         return jsonify({'status': 'already_running', 'url': 'http://localhost:8501'})
-    cmd = ['streamlit', 'run', 'page.py']
+    cmd = ['streamlit', 'run', 'page.py', '--server.address', '0.0.0.0', '--server.port', '8501']
     streamlit_process = subprocess.Popen(cmd, cwd=os.getcwd(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # wait a bit for startup
     for _ in range(25):
