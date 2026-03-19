@@ -273,21 +273,9 @@
       }
 
       document.getElementById('generateBtn').addEventListener('click', function() {
-        const resumeText = getResumeText();
-        let out = document.getElementById('resumeOutput');
-        if (!out) {
-          out = document.createElement('pre');
-          out.id = 'resumeOutput';
-          out.style.background = '#0b1220';
-          out.style.border = '1px solid rgba(255,255,255,0.12)';
-          out.style.borderRadius = '10px';
-          out.style.padding = '0.9rem';
-          out.style.color = '#eef3ff';
-          out.style.marginTop = '1rem';
-          out.style.whiteSpace = 'pre-wrap';
-          document.querySelector('.page').appendChild(out);
-        }
-        out.textContent = resumeText;
+        const host = window.location.hostname || 'localhost';
+        const url = `http://${host}:8501`;
+        window.open(url, '_blank');
       });
 
       document.getElementById('downloadBtn').addEventListener('click', function() {
