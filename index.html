@@ -272,24 +272,28 @@
         return output.join('\n');
       }
 
-      document.getElementById('generateBtn').addEventListener('click', function() {
+      function ensureStreamlitAndOpen() {
+        const streamlitUrl = 'http://localhost:8501';
+        if (window.location.protocol === 'file:') {
+          alert('Please open this app through http://localhost:8000 (run "python server.py").');
+          return;
+        }
+
         fetch('http://localhost:8000/start-streamlit', { method: 'POST' })
           .then((res) => res.json())
           .then((data) => {
-            if (data.url) {
-              window.open(data.url, '_blank');
-            } else {
-              window.open('http://localhost:8501', '_blank');
-            }
+            const url = data.url || streamlitUrl;
+            window.open(url, '_blank');
           })
           .catch(() => {
-            // Fallback: if start-server fails, still try Streamlit directly.
-            window.open('http://localhost:8501', '_blank');
+            window.open(streamlitUrl, '_blank');
             setTimeout(() => {
-              alert('Could not talk to local server at http://localhost:8000. Make sure you run "python server.py".');
+              alert('Could not talk to local server at http://localhost:8000. Run "python server.py" and reload this page.');
             }, 200);
           });
-      });
+      }
+
+      document.getElementById('generateBtn').addEventListener('click', ensureStreamlitAndOpen);
 
       document.getElementById('downloadBtn').addEventListener('click', function() {
         const text = getResumeText();
